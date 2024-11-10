@@ -1,0 +1,45 @@
+﻿@* @using BlazorIsleemApp.Components.Shared *@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+<link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
+@* <link href="assets/css/main.css" rel="stylesheet"> *@
+
+<div style="direction:rtl;font-family:Cairo" class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div  class="top-row px-4 bg-dark text-white">
+           
+            <a style="color:white" href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+           <AuthorizeView>
+               <Authorized>
+                    <a href="/Logout">Logout</a>
+                </Authorized>
+               <NotAuthorized>
+<a href="/LogIn">LogIn</a>
+               </NotAuthorized>
+           </AuthorizeView>
+            <a style="color:white" href="Index" target="_blank">PreviewIndex</a>
+            <a style="color:white" href="/" target="_blank">Admin</a>
+        </div>
+
+        <article class="content px-4">
+            <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+    <script src="_framework/blazor.web.js"></script> 
+<script src="assets/js/main.js"></script>
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />

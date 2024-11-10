@@ -1,0 +1,258 @@
+﻿@page "/"
+ @using Microsoft.AspNetCore.Mvc.Rendering
+ @rendermode InteractiveServer
+ @using BlazorIsleemApp.ToastMessage
+ @using ToastService = BlazorIsleemApp.ToastMessage.ToastService;
+
+@inject ToastService ToastService
+@using Microsoft.AspNetCore.Components.QuickGrid
+﻿@using Microsoft.AspNetCore.Components.QuickGrid.Infrastructure
+@using Microsoft.EntityFrameworkCore
+@using BlazorIsleemApp.Models
+@inject NotificationService _NotificationService
+@inject Data.PDbContext Db
+@inject NavigationManager NavigationManager
+@using Radzen
+@using Radzen.Blazor
+
+@* 
+<script src="~/dist/js/ِalertdisappear.js"></script> *@
+<a class="btn btn-outline-dark " href="/Edit">New Person</a>
+<p></p>
+@if (errors.Count > 0)
+{
+    <h2>Errors</h2>
+   <div style="direction:rtl; padding-right:50px">
+    <ul class="text-danger">
+        @foreach (var error in errors)
+        {
+
+                <li style="background-color:crimson;"><span style="font-family:Cairo;font-size:16px;height:30px;padding-right:50px;color:white">@error</span></li>
+                <li>
+                   
+                </li>
+        }
+    </ul>
+    </div>
+}
+@if(Person is not null)
+{
+@*     <QuickGrid  Items="Person.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="f=>f.Id" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="f=>f.Name" Title="(Name(N)" Sortable="true"></PropertyColumn>
+
+        <TemplateColumn Title="(Image(PH)">
+            <div>
+                <span>
+                    <img class="img-thumbnail" width="60px" height="60px" src="MyImages/@context.ImagePath" />
+                   
+                </span>
+            </div>
+        </TemplateColumn>
+        <TemplateColumn Title="(Actions(Edit-Delete)">
+           
+       <div>
+           <span>
+                    <a class="btn btn-outline-dark" href="Edit/@context.Id">Edit</a>
+                    <a class="btn btn-outline-danger" @onclick="@(() => DeleteAsync(@context.Id))">Delete</a>
+           </span>
+       </div>
+   </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination"/> *@
+    <RadzenDataGrid AllowPaging="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" PageSize="4" AllowSorting="true" Data="@Person" TItem="Person" ColumnWidth="150px" >
+        <Columns>
+            <RadzenDataGridColumn TItem="Person" Property="Id" Title="Person Id"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Person" Property="Name" Title="Person Name"></RadzenDataGridColumn>
+               <RadzenDataGridColumn TItem="Person" Property="ImagePath" Title="Person ImagePath">
+                <Template>
+                    <img src="MyImages/@context.ImagePath" width="60px" height="60px"/>
+                </Template>
+
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Person" Property="Id" Title="Person Actions">
+                <Template>
+                    <div>
+                        <span>
+                            <a class="btn btn-outline-dark" href="Edit/@context.Id">Edit</a>
+                            <a class="btn btn-outline-danger" @onclick="@(() => DeleteAsync(@context.Id))" >Delete</a>
+                        </span>
+                    </div>
+                </Template>
+
+            </RadzenDataGridColumn>
+              
+
+        </Columns>
+    </RadzenDataGrid>
+
+
+}
+@* <RadzenAlert AlertStyle="AlertStyle.Warning" ShowIcon="false" Variant="Variant.Flat"  id="@MessageSuccess" Shade="Shade.Lighter" >
+    
+</RadzenAlert> *@
+<Dropdown Color="DropdownColor.Info" Size="DropdownSize.Small">
+    <DropdownToggleButton>Large button</DropdownToggleButton>
+    <DropdownMenu>
+        @foreach(var item in Person.DistinctBy(x=> x.Name))
+        {
+        <DropdownItem To="#" Type="DropdownItemType.Link">@item.Name</DropdownItem>
+        }
+    </DropdownMenu>
+</Dropdown>
+ 
+
+<RadzenNotification  />
+
+@code{
+    public class Item
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+
+    private List<Item> items = new List<Item>
+    {
+        new Item { Name = "Item 1", Value = "Value 1" },
+        new Item { Name = "Item 2", Value = "Value 2" },
+        new Item { Name = "Item 3", Value = "Value 3" }
+    };
+
+    private string selectedValue;
+
+    private void OnItemSelected(ChangeEventArgs e)
+    {
+        selectedValue = e.Value.ToString();
+    }
+
+       void ShowNotificationS()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Success,
+                Summary = "حذف البيانات",
+                Detail = "تم حذف البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+
+    void ShowNotification()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Error,
+                Summary = "حذف البيانات",
+                Detail = "تم حذف البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+
+    public static readonly NotificationMessage MessageSuccess =
+        new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "sssss sssss ssss sssss", Duration = 1500 };
+    PaginationState pagination = new PaginationState {ItemsPerPage=5};
+    [SupplyParameterFromForm]
+    public Person NewPerson { get; set; } = new Person();
+    private List<string> errors = new();
+    private List<Person> Person = new ();
+    private bool isUploading { get; set; } = false;
+    private string imageUrl { get; set; }
+    private string fileName { get; set; }
+    IQueryable<Person> PersonsQueryable = Enumerable.Empty<Person>().AsQueryable();
+
+    void SearchPerson(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value!.ToString()))
+        {
+            var result = Person.Where(c => c.Name!.Contains(e.Value!.ToString()!, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            PersonsQueryable = Enumerable.Empty<Person>().AsQueryable();
+            if (result.Count == 0)
+            {
+                return;
+            }
+
+            if (result.Any())
+            {
+                foreach (var person in result.OrderBy(_ => _.Id))
+                    PersonsQueryable = PersonsQueryable.Concat(new[] { person }.AsQueryable());
+            }
+            return;
+        }
+        OnInitializedAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        Person = await Db.persons.OrderByDescending(x => x.Id).ToListAsync();
+      
+
+    }
+
+
+    private async Task Edit(int id)
+    {
+        var per = await Db.persons.FindAsync(id);
+        if (per == null)
+        {
+            Person temp = new Person();
+
+            return;
+        }
+
+        return ;
+    }
+
+
+    private int Value { get
+        {
+            return isUploading ? 100 : 0;
+        } }
+
+    private async void LoadFiles(InputFileChangeEventArgs e)
+
+    {
+
+        isUploading = true;
+
+        fileName = e.File.Name;
+
+        StateHasChanged();
+
+
+
+        Task.Delay(500).Wait();
+
+        var imageFile = await e.File.RequestImageFileAsync(e.File.ContentType, 300, int.MaxValue);
+
+
+        using (FileStream fileStream = new($"wwwroot//MyImages//{e.File.Name}", FileMode.Create))
+
+        {
+            await imageFile.OpenReadStream().CopyToAsync(fileStream);
+
+            imageUrl = $"{e.File.Name}";
+
+        }
+
+        //  fileName = string.Empty;
+
+        isUploading = false;
+
+        StateHasChanged();
+
+    }
+    public async Task DeleteAsync(int id)
+    {
+        var pn = await Db.persons.FindAsync(id);
+        if (pn != null)
+        {
+            Db.persons.Remove(pn);
+            await Db.SaveChangesAsync();
+            ShowNotification();
+            Person = await Db.persons.ToListAsync();
+            
+        }
+    }
+   
+}

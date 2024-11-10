@@ -1,0 +1,310 @@
+﻿@page "/AddEditNewsCategory/{Id:int?}"
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore
+@using BlazorIsleemApp.Models
+@rendermode InteractiveServer
+@using Radzen.Blazor
+@using Radzen
+@using System.Threading.Tasks
+@inject Data.PDbContext Db
+@inject NavigationManager NavigationManager
+<PageTitle>AddEditNewsCategory</PageTitle>
+
+
+<style>
+    .ffont{
+        font-family:Cairo;
+        font-size: 16px;
+    }
+</style>
+<div class="row mt-2">
+    <div class="col-8">
+        <EditForm class="ffont" Model="NewCat" FormName="NewCat" OnValidSubmit="HandleValidSubmit">
+            <div class="col-2">
+                <label>Name</label>
+             
+            </div>
+            <div class="col-10 mt-2">
+                <InputText class="form-control" @bind-Value="NewCat.Name" />
+            </div>
+       
+            
+        
+
+            @if (NewCat.Id == 0)
+            {
+                <button class="btn btn-outline-dark mt-2" type="submit" @onclick="edit">Save Data</button>
+                <RadzenNotification />
+            }
+            else if (NewCat.Id > 0)
+            {
+                <button class="btn btn-outline-dark mt-2" type="submit" href="/AddEditNewsCategory" @onclick="edit">Update Data</button>
+              
+            }<a class="btn btn-primary mt-2" type="submit" href="/AddEditNewsCategory">Cancle</a>
+        </EditForm>
+        </div></div>
+     
+   
+
+@if (errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class="text-danger">
+        @foreach (var error in errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+        <p></p>
+        @if (errors.Count > 0)
+        {
+            <h2>Errors</h2>
+            <div style="direction:rtl; padding-right:50px">
+                <ul class="text-danger">
+                    @foreach (var error in errors)
+                    {
+
+                        <li style="background-color:crimson;"><span style="font-family:Cairo;font-size:16px;height:30px;padding-right:50px;color:white">@error</span></li>
+                        <li>
+
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+       @*  @if (NewCat is not null)
+        { *@
+
+    <RadzenDataGrid class="ffont" AllowPaging="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" PageSize="4" AllowSorting="true" Data="@newscategory" TItem="NewsCategory" ColumnWidth="150px">
+                <Columns>
+            <RadzenDataGridColumn TItem="NewsCategory" Property="Id" Title="NewsCategory Id"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="NewsCategory" Property="Name" Title="NewsCategory Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="NewsCategory" Property="Date" Title="NewsCategory Date"> </RadzenDataGridColumn>
+                    <RadzenDataGridColumn  Title="NewsCategory Actions">
+                        <Template>
+                            <div>
+                                <span>
+                            <a class="btn btn-outline-dark" href="AddEditNewsCategory/@context.Id">Edit</a>
+                                    <a class="btn btn-outline-danger" @onclick="@(() => DeleteAsync(@context.Id))">Delete</a>
+                                </span>
+                            </div>
+                        </Template>
+
+                    </RadzenDataGridColumn>
+                  </Columns>
+            </RadzenDataGrid>
+
+        <RadzenNotification />
+
+
+
+@code {
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        newscategory = await Db.newsCategories.OrderByDescending(x => x.Id).ToListAsync();
+    }
+
+    private string selectedValue;
+
+    private void OnItemSelected(ChangeEventArgs e)
+    {
+        selectedValue = e.Value.ToString();
+    }
+    private List<Person> Person3 = new List<Person>();
+    private List<NewsCategory> category = new List<NewsCategory>();
+    [SupplyParameterFromForm]
+    public Person Person2 { get; set; } = new Person();
+    protected override void OnInitialized()
+    {
+        newscategory =  Db.newsCategories.OrderByDescending(x => x.Id).ToList();
+
+    }
+
+
+    [SupplyParameterFromForm]
+    public NewsCategory NewCat { get; set; } = new NewsCategory();
+    private List<string> errors = new();
+    private List<NewsCategory> newscategory = new();
+    private bool isUploading { get; set; } = false;
+    private string imageUrl { get; set; }
+    private string fileName { get; set; }
+
+    //----------------------------------------------------
+
+
+
+    //-----------------------------------------------------
+    private string labelClass = "col-lg-12 col-sm-12 progressbar-label";
+    private string currentUri;
+    private string color = "#98c5f5";
+    public string FontFamily { get; set; }
+
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private void HandleValidSubmit()
+    {
+        // هنا يمكنك إضافة الكود لإضافة البيانات إلى قاعدة البيانات أو معالجتها
+        // بعد الإضافة، نقوم بتفريغ البيانات
+        NewCat = new NewsCategory();
+    }
+
+    void edit()
+    {
+
+        AddUpdateAsync(NewCat);
+        NavigationManager.NavigateTo("/AddEditNewsCategory");
+        ShowNotificationS();
+     
+        
+     
+    }
+  
+    public Task<bool> AddUpdateAsync(NewsCategory category)
+    {
+
+        if (category == null)
+        {
+
+            Db.newsCategories.Add(category);
+            Db.SaveChanges();
+            OnInitialized();
+            return Task.FromResult(true);
+         
+        }
+        else
+        {
+
+            Db.newsCategories.Update(category);
+            Db.SaveChanges();
+            OnInitialized();
+            return Task.FromResult(true);
+        }
+      
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        if (Id != 0)
+        {
+            NewCat = await GetEmpAByIdsync(Id);
+        }
+
+    }
+    void ShowNotificationS()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Success,
+                Summary = "حفظ البيانات",
+                Detail = "تم حفظ البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+    void ShowNotification()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Error,
+                Summary = "حذف البيانات",
+                Detail = "تم حذف البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var pn = await Db.newsCategories.FindAsync(id);
+        if (pn != null)
+        {
+            Db.newsCategories.Remove(pn);
+            await Db.SaveChangesAsync();
+            ShowNotification();
+            newscategory = await Db.newsCategories.ToListAsync();
+
+        }
+    }
+    public async Task<NewsCategory> GetEmpAByIdsync(int Id)
+    {
+        return await Db.newsCategories.FindAsync(Id);
+    }
+
+    void ShowNotificationSE()
+    {
+        Person pp = new Person();
+        if (pp.Id < 1)
+        {
+            ShowNotificationS();
+        }
+        else if (pp.Id > 0)
+        {
+            ShowNotificationE();
+        }
+    }
+
+
+    void ShowNotificationE()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Info,
+                Summary = "تعديل البيانات",
+                Detail = "تم تعديل البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+    private async Task SubmitForm()
+    {
+        errors.Clear();
+        try
+        {
+
+            isUploading = false;
+
+
+
+          
+            Db.newsCategories.Add(NewCat);
+            Db.SaveChangesAsync();
+
+
+            // NavigationManager.NavigateTo("/");
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Error:{ex.Message}");
+            // throw;
+        }
+
+    }
+
+
+
+
+
+
+
+
+    // public Person NewPerson = new Person();
+    private int value
+    {
+        get
+        {
+            return isUploading ? 100 : 0;
+        }
+    }
+
+}

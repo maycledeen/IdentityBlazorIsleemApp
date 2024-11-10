@@ -1,0 +1,364 @@
+﻿@page "/Edit/{Id:int?}"
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore
+@using BlazorIsleemApp.Models
+@rendermode InteractiveServer
+@* @attribute [StreamRendering] *@
+@using Radzen.Blazor
+@using Radzen
+@using System.Threading.Tasks
+@inject Data.PDbContext Db
+
+<PageTitle>Edit</PageTitle>
+
+<style>
+    .dropzone {
+        position: relative;
+        overflow: hidden;
+        border: 2px dotted rgba(0,0,0,.2);
+        background-color: rgba(0,0,0,.09);
+        margin-bottom: 20px;
+        border-radius: 15px;
+    }
+
+        .dropzone.dropzone-active {
+            background-color: #878388;
+        }
+</style>
+
+<div class="row mt-2">
+    <div class="col-8">
+        <EditForm Model="NewPerson" FormName="NewPerson" >
+            <div class="col-2">
+                <label>Category</label>
+            </div>
+            <div class="col-10 mt-2">
+                <InputSelect class="form-control"  @bind-Value="NewPerson.Name" @onchange="OnItemSelected">
+                    <option value="">اختر عنصرًا</option>
+                    @foreach (var item in Person3.DistinctBy(x => x.Name))
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </InputSelect>
+
+                @if (!string.IsNullOrEmpty(selectedValue))
+                {
+                    <p class="mt-3" style="font-family:Cairo;font-size:16px">القيمة المختارة:<h2> @selectedValue</h2></p>
+                }
+            </div>
+        <div class="col-2"> <label>Name</label></div>
+
+        <div class="col-10 mt-2">
+            <InputText class="form-control" @bind-Value="NewPerson.Name" />
+       </div> <div class="col-2">
+            <label>Image Path</label></div>
+            
+            <div class="col-10 mt-2">
+                <InputFile class="form-control "  OnChange="@LoadFiles" />
+            
+            </div>
+           
+            @if(NewPerson.Id==0)
+            {
+                <button class="btn btn-outline-dark mt-2" type="submit" @onclick="edit">Save Data</button>
+                <RadzenNotification />
+             }else if(NewPerson.Id >0){
+            <button class="btn btn-outline-dark mt-2" type="submit" @onclick="edit">Update Data</button>
+                <RadzenNotification />
+             }<a class="btn btn-primary mt-2" type="submit" href="/">Cancle</a>
+</EditForm>
+        <br />
+        <div class="col-md-10 p-3">
+            <RadzenProgressBar  Value="@Value" Mode="ProgressBarMode.Indeterminate" />
+        </div>
+        <br />
+    </div><div class="col-2">
+        @if (imageUrl == null)
+        {
+            <img  />
+        }
+        @if (imageUrl != null)
+        {
+            <img id="im1" src="MyImages/@imageUrl" width=100% class="img-thumbnail" />
+          @*   <label class="progress progress-bar mt-3" style="background-color:darkblue ;width:@progressValue; height:15px; "><h7 class="mt-1">@progressValue % </h7></label>
+ *@
+        }
+        else  @if (NewPerson.ImagePath != null){
+        <img src="MyImages/@NewPerson.ImagePath" width=120px height=120px class="img-thumbnail " />
+            
+
+        }
+    </div>
+</div>
+
+
+
+   
+   
+   
+
+
+
+<style>
+    .progress {
+        position: relative;
+        height: 20px;
+        width:100%;
+        border-radius: 0px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 2.6s;
+        text-align: center;
+        color: white;
+        line-height: 20px; /* Center text vertically */
+    }
+</style>
+
+<br />
+
+@if (errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class="text-danger">
+        @foreach (var error in errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@inject Data.PDbContext Db
+@using BlazorIsleemApp.Models
+@inject NavigationManager NavigationManager
+
+@code{
+
+    private string selectedValue;
+
+    private void OnItemSelected(ChangeEventArgs e)
+    {
+        selectedValue = e.Value.ToString();
+    }
+    private List<Person> Person3 = new List<Person>();
+    List<object> Options = new List<object>();
+    [SupplyParameterFromForm]
+    public Person Person2 { get; set; } = new Person();
+    protected override void OnInitialized()
+    {
+        Person3 =  Db.persons.ToList();
+
+    }
+    [Parameter]
+    public int Progress { get; set; }
+    private int progressValue = 0;
+
+    private async Task StartProgress()
+    {
+        progressValue = 0;
+
+        for (int i = 0; i <= 100; i++)
+        {
+            progressValue = i;
+            // Notify the Blazor component to re-render
+            await Task.Delay(200); // Simulate work being done
+            StateHasChanged();
+
+        }
+
+    }
+    [SupplyParameterFromForm]
+    public Person NewPerson { get; set; } = new Person();
+    private List<string> errors = new();
+    private List<Person> Person = new ();
+    private bool isUploading { get; set; } = false;
+    private string imageUrl { get; set; }
+    private string fileName { get; set; }
+
+    //----------------------------------------------------
+
+
+
+    //-----------------------------------------------------
+    private string labelClass = "col-lg-12 col-sm-12 progressbar-label";
+    private string currentUri;
+    private string color = "#98c5f5";
+    public string FontFamily { get; set; }
+
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+
+    private int Value
+    {
+        get
+        {
+            return isUploading ? 100 : 0;
+        }
+    }
+    void edit()
+    {
+        AddUpdateAsync(NewPerson);
+
+        ShowNotificationSE();
+        NavigationManager.NavigateTo("/");
+
+    }
+    private async void LoadFiles(InputFileChangeEventArgs e)
+
+    {
+
+        StartProgress();
+        isUploading = true;
+
+        fileName = e.File.Name;
+
+        StateHasChanged();
+
+
+        Task.Delay(1000).Wait();
+
+        var imageFile = await e.File.RequestImageFileAsync(e.File.ContentType, 300, int.MaxValue);
+
+
+        using (FileStream fileStream = new($"wwwroot//MyImages//{e.File.Name}", FileMode.Create))
+
+        {
+            await imageFile.OpenReadStream().CopyToAsync(fileStream);
+
+            imageUrl = $"{e.File.Name}";
+
+            StateHasChanged();
+        }
+
+        // fileName = string.Empty;
+
+        isUploading = false;
+
+        StateHasChanged();
+
+
+    }
+    public Task<bool> AddUpdateAsync(Person person)
+    {
+
+        if (person == null)
+        {
+            NewPerson.ImagePath = fileName;
+            Db.persons.Add(person);
+            Db.SaveChanges();
+
+
+            return Task.FromResult(true);
+
+        }
+        else
+        {
+            NewPerson.ImagePath = fileName;
+            Db.persons.Update(person);
+            Db.SaveChanges();
+            return Task.FromResult(true);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        if (Id != 0)
+        {
+            NewPerson =await GetEmpAByIdsync(Id);
+        }
+
+    }
+
+    public async Task<Person> GetEmpAByIdsync(int Id)
+    {
+        return await Db.persons.FindAsync(Id);
+    }
+
+    void ShowNotificationSE()
+    {
+        Person pp = new Person();
+        if (pp.Id < 1)
+        {
+            ShowNotificationS();
+        }
+        else if (pp.Id > 0)
+        {
+            ShowNotificationE();
+        }
+    }
+
+    void ShowNotificationS()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Success,
+                Summary = "حغظ البيانات",
+                Detail = "تم اضافة البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+    void ShowNotificationE()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Info,
+                Summary = "تعديل البيانات",
+                Detail = "تم تعديل البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+    private async Task SubmitForm()
+    {
+        errors.Clear();
+        try
+        {
+
+            isUploading = false;
+
+
+
+            NewPerson.ImagePath = fileName;
+            Db.persons.Add(NewPerson);
+            Db.SaveChangesAsync();
+          
+         
+           // NavigationManager.NavigateTo("/");
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Error:{ex.Message}");
+            // throw;
+        }
+
+    }
+
+
+
+
+
+
+
+
+   // public Person NewPerson = new Person();
+    private int value
+    {
+        get
+        {
+            return isUploading ? 100 : 0;
+        } }
+
+   
+  
+   
+}

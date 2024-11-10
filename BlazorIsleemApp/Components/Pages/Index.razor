@@ -1,0 +1,615 @@
+﻿@page "/Index"
+@layout IndexLayout
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore
+@using BlazorIsleemApp.Models
+@rendermode InteractiveServer
+@using Radzen.Blazor
+@using Radzen
+@using System.Threading.Tasks
+@inject Data.PDbContext Db
+@inject NavigationManager NavigationManager
+
+
+<section id="hero" class="hero section light-background" style="font-family:Cairo;text-align:justify;direction:rtl; ">
+
+    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+       
+        <div class="row gy-5 " >
+            @foreach (var item in NN.Take(1))
+            {
+                <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center" style="font-family:Cairo;text-align:justify;direction:rtl">
+                    <a class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" target="_self" href="FullDetails/@item.Id">
+                        <h4  style="font-family:Cairo;text-align:justify;direction:rtl">@item.Title</h4>
+                        <p>@item.FullDetails</p>
+                    </a>
+                <div class="d-flex">
+                    <a href="#about" class="btn-get-started">Get Started</a>
+                    <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
+                </div>
+            </div>
+            <div class="col-lg-6 order-1 order-lg-2">
+                    <img src="MyImages/@item.ImagePath" class=" img-thumbnail border-white shadow-lg img-fluid" width="100%" alt="">
+                </div>
+                }
+        </div>
+    </div>
+
+    <div class="icon-boxes position-relative" data-aos="fade-up" data-aos-delay="200">
+        <div class="container position-relative">
+            <div class="row gy-4 mt-5">
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="icon-box"> @foreach (var item in NN.Take(4).Skip(3))
+                        {
+                            <div class="icon"><img src="MyImages/@item.ImagePath" width=100 height=100 class="rounded-circle border border-dark  " /></div>
+                        <h6 style="font-family:Cairo;text-align:justify;font-size:16px;line-height:28px" class="title"><a href="FullDetails/@item.Id" class="stretched-link">@item.Title</a></h6>
+                        } </div>
+                </div><!--End Icon Box -->
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="icon-box">
+                        @foreach (var item in NN.Take(3).Skip(2))
+                        {
+                            <div class="icon"><img src="MyImages/@item.ImagePath" alt="Cinque Terre" width="100" height="100" class="rounded-circle border border-dark " /></div>
+                            <h6 style="font-family:Cairo;text-align:justify;font-size:16px;line-height:28px" class="title"><a href="FullDetails/@item.Id" class="stretched-link">@item.Title</a></h6>
+                        }
+                    </div>
+                </div><!--End Icon Box -->
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="icon-box">
+                        @foreach (var item in NN.Take(2).Skip(1))
+                        {
+                            <div class="icon"><img src="MyImages/@item.ImagePath" alt="Cinque Terre" width="100" height="100" class="rounded-circle border border-dark  " /></div>
+                            <h6 style="font-family:Cairo;text-align:justify;font-size:16px;line-height:28px" class="title"><a href="FullDetails/@item.Id" class="stretched-link">@item.Title</a></h6>
+                        }
+                    </div>
+                </div><!--End Icon Box -->
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="icon-box">
+                        @foreach (var item in NN.Take(1).Skip(0))
+                        {
+                            <div class="icon"><img src="MyImages/@item.ImagePath" width="100" height="100" class="rounded-circle border border-dark   " /></div>
+                            <h6 style="font-family:Cairo;text-align:justify;font-size:16px;line-height:28px" class="title"><a href="FullDetails/@item.Id" class="stretched-link">@item.Title</a></h6>
+                        }
+                    </div>
+                </div><!--End Icon Box -->
+
+            </div>
+        </div>
+    </div>
+
+</section><!-- /Hero Section -->
+<!-- About Section -->
+<section id="about" class="about section ">
+
+    <div class="container ">
+
+        <div class="row gy-12">
+            @foreach (var item in NN.Take(3).Skip(2))
+            {
+            <div class="col-lg-3 content" data-aos="fade-up" data-aos-delay="100">
+
+                    <div style="font-family:Cairo;font-size:20px; line-height:24px;text-align:justify;direction:rtl;">@item.Title</div>
+                <p class="">
+                   <div style="font-family:Cairo;font-size:14px; line-height:20px;text-align:justify;direction:rtl;"> @item.FullDetails</div>
+                </p>
+              
+                <a href="#" class="read-more"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
+            </div>
+            }
+             
+            <div class="col-lg-8 about-images" data-aos="fade-up" data-aos-delay="200">
+                     <div class="row gy-8">
+
+                    <div class="col-lg-8 ">
+                        @foreach (var item in NN.Take(3).Skip(2))
+                        {
+                            <img src="MyImages/@item.ImagePath"  width="100%"   alt="">
+                        }
+                    </div>
+                  
+                        <div class="col-lg-4">
+                        <div class="row gy-4   ">
+
+                            <div class="col-lg-12 ">
+                                
+                             
+
+                  
+                                @foreach (var item in NN.Take(2).Skip(0))
+                                {
+                                    
+                                    <img src="MyImages/@item.ImagePath" width="100%"  class="img-thumbnail" alt="">
+                                    <p><div style="font-family:Cairo;font-size:14px; line-height:20px;text-align:justify;direction:rtl;padding:2px">@item.Title</div></p>
+                                }
+                            </div>
+                                </div>
+                            
+                    </div>
+                    </div>
+
+            </div>
+                      
+        </div>
+
+    </div>
+</section><!-- /About Section -->
+<!-- Services Section -->
+<section id="services" class="services section">
+   
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Services</h2>
+        <div><span>Check Our</span> <span class="description-title">Services</span></div>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+        <div class="row gy-4">
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(6).Skip(5))
+                    {
+                     <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+                    
+                   @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                   </a> @* </a> *@
+                        <p><div style="font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                        }  </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(5).Skip(4))
+                    {
+                        <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+                        @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                        </a> @* </a> *@
+                        <p><div style="font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                    }
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(4).Skip(3))
+                    {
+                        <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+
+                        @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                        </a> @* </a> *@
+                        <p><div style="font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                    }
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(3).Skip(2))
+                    {
+                         <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+
+                        @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                        </a> @* </a> *@
+                        <p><div style="font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                    }
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(2).Skip(1))
+                    {
+                          <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+
+                        @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                        </a> @* </a> *@
+                        <p><div style="font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                    }
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="service-item  position-relative  ">
+                    @foreach (var item in NN.Take(1).Skip(0))
+                    {
+                          <div style="direction:rtl;font-family:Cairo;font-size:10px">
+                            <a class="btn btn-outline-primary" href="FullDetails/@item.Id">إقرأ التفاصيل   <Icon Name="IconName.BookmarkStarFill" Size="IconSize.x5"></Icon></a> &nbsp; &nbsp;  <img src="MyImages/@item.ImagePath" width="90" height="90" class=" rounded-circle shadow-lg border border-primary " alt="Responsive image" />
+                        </div>
+
+
+                        @*  <a href="service-details.html" class="stretched-link"> *@
+                        <a class=" link-primary icon-link-hover link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover " href="FullDetails/@item.Id">
+
+                            <h3 class="btn-outline-primary" style="color:black; font-family:Cairo;font-size:18px;direction:rtl;text-align:justify; ">@item.Title</h3>
+                        </a> @* </a> *@
+                        <p><div style=" font-family:Cairo;font-size:18px;direction:rtl;text-align:justify;color:midnightblue">@item.FullDetails.Substring(0, Math.Min(113, item.FullDetails.Length))</div></p>
+                    }
+                </div>
+            </div><!-- End Service Item -->
+
+        </div>
+
+    </div>
+
+</section><!-- /Services Section -->
+<!-- Features Section -->
+<section id="features" class="features section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Features</h2>
+        <div><span>Check Our</span> <span class="description-title">Features</span></div>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+        <div class="row gy-5 justify-content-between">
+
+            <div class="col-xl-5" data-aos="zoom-out" data-aos-delay="100">
+                <img src="assets/assets/img//template/eStartup/features.svg" class="img-fluid" alt="">
+            </div>
+
+            <div class="col-xl-6 d-flex">
+                <div class="row align-self-center gy-4">
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Eos aspernatur rem</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Facilis neque ipsa</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Volup amet volupt</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="500">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Rerum omnis sint</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="600">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Alias possimus</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                    <div class="col-md-6" data-aos="fade-up" data-aos-delay="700">
+                        <div class="feature-box d-flex align-items-center">
+                            <i class="bi bi-check"></i>
+                            <h3>Repellendus molli</h3>
+                        </div>
+                    </div><!-- End Feature Item -->
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- /Features Section -->
+<!-- Pricing Section -->
+<section id="pricing" class="pricing section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Pricing</h2>
+        <div><span>Check Our</span> <span class="description-title">Pricing</span></div>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+        <div class="row gy-4">
+
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="pricing-tem">
+                    <h3 style="color: #20c997;">Free Plan</h3>
+                    <div class="price"><sup>$</sup>0<span> / mo</span></div>
+                    <div class="icon">
+                        <i class="bi bi-box" style="color: #20c997;"></i>
+                    </div>
+                    <ul>
+                        <li>Aida dere</li>
+                        <li>Nec feugiat nisl</li>
+                        <li>Nulla at volutpat dola</li>
+                        <li class="na">Pharetra massa</li>
+                        <li class="na">Massa ultricies mi</li>
+                    </ul>
+                    <a href="#" class="btn-buy">Buy Now</a>
+                </div>
+            </div><!-- End Pricing Item -->
+
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="pricing-tem">
+                    <span class="featured">Featured</span>
+                    <h3 style="color: #0dcaf0;">Starter Plan</h3>
+                    <div class="price"><sup>$</sup>19<span> / mo</span></div>
+                    <div class="icon">
+                        <i class="bi bi-send" style="color: #0dcaf0;"></i>
+                    </div>
+                    <ul>
+                        <li>Aida dere</li>
+                        <li>Nec feugiat nisl</li>
+                        <li>Nulla at volutpat dola</li>
+                        <li>Pharetra massa</li>
+                        <li class="na">Massa ultricies mi</li>
+                    </ul>
+                    <a href="#" class="btn-buy">Buy Now</a>
+                </div>
+            </div><!-- End Pricing Item -->
+
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="pricing-tem">
+                    <h3 style="color: #fd7e14;">Business Plan</h3>
+                    <div class="price"><sup>$</sup>29<span> / mo</span></div>
+                    <div class="icon">
+                        <i class="bi bi-airplane" style="color: #fd7e14;"></i>
+                    </div>
+                    <ul>
+                        <li>Aida dere</li>
+                        <li>Nec feugiat nisl</li>
+                        <li>Nulla at volutpat dola</li>
+                        <li>Pharetra massa</li>
+                        <li>Massa ultricies mi</li>
+                    </ul>
+                    <a href="#" class="btn-buy">Buy Now</a>
+                </div>
+            </div><!-- End Pricing Item -->
+
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+                <div class="pricing-tem">
+                    <h3 style="color: #0d6efd;">Ultimate Plan</h3>
+                    <div class="price"><sup>$</sup>49<span> / mo</span></div>
+                    <div class="icon">
+                        <i class="bi bi-rocket" style="color: #0d6efd;"></i>
+                    </div>
+                    <ul>
+                        <li>Aida dere</li>
+                        <li>Nec feugiat nisl</li>
+                        <li>Nulla at volutpat dola</li>
+                        <li>Pharetra massa</li>
+                        <li>Massa ultricies mi</li>
+                    </ul>
+                    <a href="#" class="btn-buy">Buy Now</a>
+                </div>
+            </div><!-- End Pricing Item -->
+
+        </div><!-- End pricing row -->
+
+    </div>
+
+</section><!-- /Pricing Section -->
+<!-- Faq Section -->
+<section id="faq" class="faq section light-background">
+
+    <div class="container">
+
+        <div class="row gy-4">
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="content px-xl-5">
+                    <h3><span>Frequently Asked </span><strong>Questions</strong></h3>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Duis aute irure dolor in reprehenderit
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+
+                <div class="faq-container">
+                    <div class="faq-item faq-active">
+                        <h3><span class="num">1.</span> <span>Non consectetur a erat nam at lectus urna duis?</span></h3>
+                        <div class="faq-content">
+                            <p>Feugiat pretium nibh ipsum consequat. Tempus iaculis urna id volutpat lacus laoreet non curabitur gravida. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus non.</p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div><!-- End Faq item-->
+
+                    <div class="faq-item">
+                        <h3><span class="num">2.</span> <span>Feugiat scelerisque varius morbi enim nunc faucibus a pellentesque?</span></h3>
+                        <div class="faq-content">
+                            <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div><!-- End Faq item-->
+
+                    <div class="faq-item">
+                        <h3><span class="num">3.</span> <span>Dolor sit amet consectetur adipiscing elit pellentesque?</span></h3>
+                        <div class="faq-content">
+                            <p>Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci. Faucibus pulvinar elementum integer enim. Sem nulla pharetra diam sit amet nisl suscipit. Rutrum tellus pellentesque eu tincidunt. Lectus urna duis convallis convallis tellus. Urna molestie at elementum eu facilisis sed odio morbi quis</p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div><!-- End Faq item-->
+
+                    <div class="faq-item">
+                        <h3><span class="num">4.</span> <span>Ac odio tempor orci dapibus. Aliquam eleifend mi in nulla?</span></h3>
+                        <div class="faq-content">
+                            <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div><!-- End Faq item-->
+
+                    <div class="faq-item">
+                        <h3><span class="num">5.</span> <span>Tempus quam pellentesque nec nam aliquam sem et tortor consequat?</span></h3>
+                        <div class="faq-content">
+                            <p>Molestie a iaculis at erat pellentesque adipiscing commodo. Dignissim suspendisse in est ante in. Nunc vel risus commodo viverra maecenas accumsan. Sit amet nisl suscipit adipiscing bibendum est. Purus gravida quis blandit turpis cursus in</p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div><!-- End Faq item-->
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</section><!-- /Faq Section -->
+<!-- Contact Section -->
+<section id="contact" class="contact section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <div><span>Need Help?</span> <span class="description-title">Contact Us</span></div>
+    </div><!-- End Section Title -->
+
+    <div class="container" data-aos="fade" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+            <div class="col-lg-4">
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
+                    <i class="bi bi-geo-alt flex-shrink-0"></i>
+                    <div>
+                        <h3>Address</h3>
+                        <p>A108 Adam Street, New York, NY 535022</p>
+                    </div>
+                </div><!-- End Info Item -->
+
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+                    <i class="bi bi-telephone flex-shrink-0"></i>
+                    <div>
+                        <h3>Call Us</h3>
+                        <p>+1 5589 55488 55</p>
+                    </div>
+                </div><!-- End Info Item -->
+
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+                    <i class="bi bi-envelope flex-shrink-0"></i>
+                    <div>
+                        <h3>Email Us</h3>
+                        <p>info@example.com</p>
+                    </div>
+                </div><!-- End Info Item -->
+
+            </div>
+
+            <div class="col-lg-8">
+                <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+                    <div class="row gy-4">
+
+                        <div class="col-md-6">
+                            <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                        </div>
+
+                        <div class="col-md-6 ">
+                            <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                        </div>
+
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                        </div>
+
+                        <div class="col-md-12">
+                            <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                        </div>
+
+                        <div class="col-md-12 text-center">
+                            <div class="loading">Loading</div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">Your message has been sent. Thank you!</div>
+
+                            <button type="submit">Send Message</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div><!-- End Contact Form -->
+
+        </div>
+
+    </div>
+
+</section><!-- /Contact Section -->
+<Toasts class="p-3" ShowCloseButton="false" Messages="messages" AutoHide="true" Delay="2000" Placement="ToastsPlacement.TopRight"  />
+
+<Button Color="ButtonColor.Primary" @onclick="() => ShowMessage(ToastType.Primary)">Primary Toast</Button>
+<Button Color="ButtonColor.Secondary" @onclick="() => ShowMessage(ToastType.Secondary)">Secondary Toast</Button>
+<Button Color="ButtonColor.Success" @onclick="() => ShowMessage(ToastType.Success)">Success Toast</Button>
+<Button Color="ButtonColor.Danger" @onclick="() => ShowMessage(ToastType.Danger)">Danger Toast</Button>
+<Button Color="ButtonColor.Warning" @onclick="() => ShowMessage(ToastType.Warning)">Warning Toast</Button>
+<Button Color="ButtonColor.Info" @onclick="() => ShowMessage(ToastType.Info)">Info Toast</Button>
+<Button Color="ButtonColor.Dark" @onclick="() => ShowMessage(ToastType.Dark)">Dark Toast</Button>
+@code{
+    private void HandleClick()
+    {
+        NavigationManager.NavigateTo("FullDetails/", true);
+    }
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+    private void ShowMessage(ToastType toastType) => messages.Add(CreateToastMessage(toastType));
+
+    private ToastMessage CreateToastMessage(ToastType toastType)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = " رسالة تنبيه" +"   ||  " ,
+            HelpText = $"{DateTime.Now.ToString("MMMM dd")}" ,
+            Message = $"مرحبا بكم : تمت العملية بنجاح في تمام الساعة:    {DateTime.Now.ToString("h:mm tt")}",
+        };
+    public int Id { get; set; } = 0;
+    public string CategoryName { get; set; } = string.Empty;
+    [SupplyParameterFromForm]
+    public News NewNews { get; set; } = new News();
+    private List<News> NN = new List<News>();
+    public async Task<News> GetEmpAByIdsync(int Id)
+    {
+        return await Db.news.FindAsync(Id);
+    }
+    protected override void OnInitialized()
+    {
+        NN = Db.news.ToList();
+
+    }
+}

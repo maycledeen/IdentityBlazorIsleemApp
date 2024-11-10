@@ -1,0 +1,425 @@
+﻿@page "/AddEditNews/{Id:int?}"
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore
+@using BlazorIsleemApp.Models
+@rendermode InteractiveServer
+@using Radzen.Blazor
+@using Radzen
+@using System.Threading.Tasks
+@inject Data.PDbContext Db
+@inject NavigationManager NavigationManager
+<PageTitle>AddEditNewsCategory</PageTitle>
+
+
+<style>
+    .ffont {
+        font-family: Cairo;
+        font-size: 16px;
+    }
+</style>
+
+        <EditForm class="ffont" Model="NewNews" FormName="NewsNews"  OnValidSubmit="HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+            <div class="container">
+                <div class="row">
+                    <div class="col-2">
+                <label>اختار الصنف</label>
+                <div class="mt-4"><label>العنوان</label></div>
+                <div class="mt-4">
+                    <label>اختار الصورة</label>   </div>
+                    </div>
+                    <div class="col-3">
+                
+                    <InputSelect id="personSelect" class="ffont form-control form-select" @bind-Value="NewNews.CatId" DisplayName="NewNews.Id" Placeholder="Select an item">
+                    @foreach (var item in Person3.DistinctBy(x => x.Name))
+                    {
+
+                        <option value="@item.Id">@item.Name</option>
+
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => NewNews.CatId)" />
+                <div class="mt-2">
+                    <InputText class="form-control" @bind-Value="NewNews.Title" />
+                    <ValidationMessage For="@(() => NewNews.Title)" />
+                </div>
+                <div class="mt-2">
+                  
+                    <InputTextArea class="form-control" @bind-Value="NewNews.FullDetails" />
+                    </div>
+                    <ValidationMessage For="@(() => NewNews.FullDetails)" />
+                    </div>
+                    <div class="col-2">
+                <label for="personSelect">اختار نفس الصنف </label>
+                <div class="mt-4">
+                    <label>التفاصيل</label>
+        </div>
+                    </div>
+                    <div class="col-3">
+                <InputSelect class="ffont form-control form-select" @bind-Value="NewNews.CategoryName" DisplayName="NewNews.Id" Placeholder="Select an item">
+                    @foreach (var item in Person3.DistinctBy(x => x.Name))
+                    {
+                        <option value="@item.Name">@item.Name</option>
+
+                    }
+
+
+                </InputSelect>
+                <ValidationMessage For="@(() => NewNews.CategoryName)" />
+                <div class="mt-2">
+                    <InputFile class="form-control " OnChange="@LoadFiles" />
+                    
+                    <ValidationMessage For="@(() => NewNews.ImagePath)" />
+                </div>
+                
+                    <button class="btn btn-outline-dark mt-2" type="submit" @onclick="edit">Save Data</button>
+                    <RadzenNotification />
+                
+      
+               
+
+            </div>
+                    <div class="col-2">
+                @if (imageUrl == null)
+                {
+                    <div style="background-color:darkgray ;z-index:100 width:160px;height:100px ;padding:16px;color:white"><h1>No Image</h1></div>
+                }
+                @if (imageUrl != null)
+                {
+                    <img id="im1" src="MyImages/@imageUrl" width=100  class="img-thumbnail" />
+                    @*   <label class="progress progress-bar mt-3" style="background-color:darkblue ;width:@progressValue; height:15px; "><h7 class="mt-1">@progressValue % </h7></label>
+                *@
+                }
+                else  @if (NewNews.ImagePath != null)
+                {
+                  <div style="margin-top:-100px">  <img src="MyImages/@NewNews.ImagePath" width=160 class="img-thumbnail " /></div>
+                     
+
+
+                }
+                    </div>
+                </div>
+            </div>
+            
+              </EditForm>
+
+
+ 
+
+ 
+
+
+
+@if (errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class="text-danger">
+        @foreach (var error in errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+<p></p>
+@if (errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <div style="direction:rtl; padding-right:50px">
+        <ul class="text-danger">
+            @foreach (var error in errors)
+            {
+
+                <li style="background-color:crimson;"><span style="font-family:Cairo;font-size:16px;height:30px;padding-right:50px;color:white">@error</span></li>
+                <li>
+
+                </li>
+            }
+        </ul>
+    </div>
+}
+@*  @if (NewCat is not null)
+        { *@
+
+<RadzenDataGrid class="ffont" AllowPaging="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" PageSize="4" AllowSorting="true" Data="@NN" TItem="News" ColumnWidth="150px">
+    <Columns>
+        <RadzenDataGridColumn TItem="News" Property="Id" Title="News Id"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="News" Property="Title" Title="News Title"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="News" Property="CatId" Title="News CatId"> </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="News" Property="CategoryName" Title="News CategoryName"> </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="NewsCategory Actions">
+            <Template>
+                <div>
+                    <span>
+                      <img src="MyImages/@context.ImagePath" width="50px" height="50px" />   </span>
+                </div>
+            </Template>
+
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="NewsCategory Actions">
+            <Template>
+                <div>
+                    <span>
+                        <a class="btn btn-outline-dark" href="AddEditNews/@context.Id">Edit</a>
+                        <a class="btn btn-outline-danger" @onclick="@(() => DeleteAsync(@context.Id))">Delete</a>
+                    </span>
+                </div>
+            </Template>
+
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenNotification />
+
+
+
+@code {
+
+
+    private async void LoadFiles(InputFileChangeEventArgs e)
+
+    {
+
+        //   StartProgress();
+        isUploading = true;
+
+        fileName = e.File.Name;
+
+        StateHasChanged();
+
+
+        Task.Delay(1000).Wait();
+
+        var imageFile = await e.File.RequestImageFileAsync(e.File.ContentType, 300, int.MaxValue);
+
+
+        using (FileStream fileStream = new($"wwwroot//MyImages//{e.File.Name}", FileMode.Create))
+
+        {
+            await imageFile.OpenReadStream().CopyToAsync(fileStream);
+
+            imageUrl = $"{e.File.Name}";
+            NewNews.ImagePath = fileName;
+            StateHasChanged();
+        }
+
+        // fileName = string.Empty;
+
+        isUploading = false;
+
+        StateHasChanged();
+
+
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        NN = await Db.news.OrderByDescending(x => x.Id).ToListAsync();
+    }
+
+    private string selectedValue;
+
+    private void OnItemSelected(ChangeEventArgs e)
+    {
+        selectedValue = e.Value.ToString();
+    }
+    private List<News> NN = new List<News>();
+    private int? selectedItem;
+    private List<NewsCategory> Person3 = new List<NewsCategory>();
+    private List<NewsCategory> category = new List<NewsCategory>();
+    [SupplyParameterFromForm]
+    public News Person2 { get; set; } = new News();
+    // protected override void OnInitialized()
+    // {
+    //     newscategory = Db.newsCategories.OrderByDescending(x => x.Id).ToList();
+
+    // }
+    protected override void OnInitialized()
+    {
+        Person3 = Db.newsCategories.ToList();
+
+    }
+
+    [SupplyParameterFromForm]
+    public News NewNews { get; set; } = new News();
+    private List<string> errors = new();
+    private List<News> newss = new();
+    private bool isUploading { get; set; } = false;
+    private string imageUrl { get; set; }
+    private string fileName { get; set; }
+
+    //----------------------------------------------------
+
+
+
+    //-----------------------------------------------------
+    private string labelClass = "col-lg-12 col-sm-12 progressbar-label";
+    private string currentUri;
+    private string color = "#98c5f5";
+    public string FontFamily { get; set; }
+
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private void HandleValidSubmit()
+    {
+        // هنا يمكنك إضافة الكود لإضافة البيانات إلى قاعدة البيانات أو معالجتها
+        // بعد الإضافة، نقوم بتفريغ البيانات
+        NewNews = new News();
+    }
+
+    void edit()
+    {
+        if(NewNews.CatId==0)
+        {
+            ShowNotificationS();
+        }
+        else{
+            AddUpdateAsync(NewNews);
+
+            NavigationManager.NavigateTo("/AddEditNews");
+            NN = Db.news.OrderByDescending(x => x.Id).ToList();
+            ShowNotification();
+           
+        }
+        
+
+    }
+
+    public Task<bool> AddUpdateAsync(News news)
+    {
+
+        if (news == null)
+        {
+
+
+            //  NewNews.ImagePath = fileName;
+            Db.news.Add(news);
+            Db.SaveChanges();
+           NN= Db.news.OrderByDescending(x => x.Id).ToList();
+            return Task.FromResult(true);
+
+        }
+        else
+        {
+            // NewNews.ImagePath = fileName;
+            Db.news.Update(news);
+            Db.SaveChanges();
+            NN = Db.news.OrderByDescending(x => x.Id).ToList();
+            return Task.FromResult(true);
+        }
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        if (Id != 0)
+        {
+            NewNews = await GetEmpAByIdsync(Id);
+        }
+
+    }
+    void ShowNotificationD()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Error,
+                Summary = "حذف البيانات",
+                Detail = "تم حذف البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+    void ShowNotificationS()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Error,
+                Summary = "البيانات المدخلة غير مكتملة",
+                Detail = "من فضلك ادخل البيانات المطلوبة من اجل اكتمال عملية الحفظ",
+                Duration = 5000
+            });
+    }
+    void ShowNotification()
+    {
+        _NotificationService.Notify(new NotificationMessage
+            {
+
+                Severity = NotificationSeverity.Success,
+                Summary = "اضافة البيانات",
+                Detail = "تم اضافة البيانات بنجاح",
+                Duration = 3000
+            });
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var pn = await Db.news.FindAsync(id);
+        if (pn != null)
+        {
+            Db.news.Remove(pn);
+            await Db.SaveChangesAsync();
+            ShowNotificationD();
+
+            NN = await Db.news.OrderByDescending(x => x.Id).ToListAsync();
+
+        }
+    }
+    public async Task<News> GetEmpAByIdsync(int Id)
+    {
+        return await Db.news.FindAsync(Id);
+    }
+
+
+
+
+    private async Task SubmitForm()
+    {
+        errors.Clear();
+        try
+        {
+
+            isUploading = false;
+
+
+            
+            Db.news.Add(NewNews);
+            Db.SaveChangesAsync();
+
+
+            // NavigationManager.NavigateTo("/");
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Error:{ex.Message}");
+            // throw;
+        }
+
+    }
+
+
+
+
+
+
+
+
+    // public Person NewPerson = new Person();
+    private int value
+    {
+        get
+        {
+            return isUploading ? 100 : 0;
+        }
+    }
+
+}

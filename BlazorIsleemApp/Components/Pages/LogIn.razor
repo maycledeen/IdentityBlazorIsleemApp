@@ -1,0 +1,82 @@
+﻿@page "/LogIn"
+@using System.ComponentModel.DataAnnotations
+@using BlazorIsleemApp.Models
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using static Microsoft.EntityFrameworkCore.DbLoggerCategory
+@inject NavigationManager NavigationManager
+@inject Data.PDbContext Db
+<h1>Login</h1>
+<div class="row">
+    <div class="col-md-6">
+        <section>
+            <EditForm Model="Input" method="post" OnValidSubmit="AuthenticateMethod" FormName="Login">
+                <DataAnnotationsValidator  />
+            
+                <div class="form-floating mb-2">
+                    <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" />
+                    <label for="email" class="form-label">Email</label>
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+                <div class="form-floating mb-2">
+                    <InputText type="password" @bind-Value="Input.Password" class="form-control"  aria-required="true" />
+                    <label for="password" class="form-label">Password</label>
+                 @*    <ValidationMessage For="() => Input.Password" class="text-danger" /> *@
+                </div>
+                <div class="text-danger">@erorrmessage</div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Login</button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+</div>
+<a class="btn btn-primary" href="Register">Register</a>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? httpContext{ get; set;}
+    private string erorrmessage;
+    [SupplyParameterFromForm]
+    private User Input { get; set; } = new();
+
+    // public async Task GetUsers(string email,string password)
+    // {
+    //     Input = await Db.users..Where(x => x.Email == email); 
+    // }
+    public async Task AuthenticateMethod()
+    {
+
+        var useraccount =  Db.users.Where(x => x.Email==Input.Email).FirstOrDefault();
+        if(useraccount.Email is null || useraccount.Password != Input.Password)
+        {
+            erorrmessage = "Erorr Email or Erorr Password";
+            return;
+        }
+        var claim = new List<Claim>
+        {
+           new Claim(type:ClaimTypes.Name,Input.Email) ,
+            new Claim(type:ClaimTypes.Role,Input.Role)
+        };
+        var Identity = new ClaimsIdentity(claim, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(Identity);
+        await httpContext.SignInAsync(principal);
+        NavigationManager.NavigateTo("/Home");
+    }
+    public async Task OnLogin()
+    {
+       
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+    }
+}
